@@ -412,7 +412,8 @@ public:
 
     virtual std::string enableFastMode(const bool& enable) override;
 
-
+    virtual std::string enumerateLightDevices() override;
+    
 protected:
 
     typedef typename CameraTraitT::CBaslerInstantCameraT CBaslerInstantCameraT;

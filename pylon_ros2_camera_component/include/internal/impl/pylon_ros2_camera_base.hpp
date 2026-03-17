@@ -318,6 +318,73 @@ void PylonROS2CameraImpl<CameraTraitT>::disableAllRunningAutoBrightessFunctions(
 }
 
 template <typename CameraTraitT>
+std::string PylonROS2CameraImpl<CameraTraitT>::enumerateLightDevices()
+{
+    try 
+    {
+        if (cam_ == nullptr) 
+        {
+            RCLCPP_ERROR(LOGGER_BASE, "Camera object is null");
+            return "Camera object is null";
+        }
+
+        if (!cam_->IsOpen()) 
+        {
+            RCLCPP_ERROR(LOGGER_BASE, "Camera is not open");
+            return "Camera is not open";
+        }
+
+        GenApi::INodeMap& nodeMap = cam_->GetNodeMap();
+        GenApi::CCommandPtr enumerateCmd(nodeMap.GetNode("BslLightControlEnumerateDevices"));
+
+        if (!enumerateCmd.IsValid()) 
+        {
+            RCLCPP_ERROR(LOGGER_BASE, "BslLightControlEnumerateDevices node not found in nodemap");
+            return "BslLightControlEnumerateDevices node not found in nodemap";
+        }
+
+        if (!GenApi::IsImplemented(enumerateCmd)) 
+        {
+            RCLCPP_ERROR(LOGGER_BASE, "BslLightControlEnumerateDevices feature not implemented in this camera");
+            return "BslLightControlEnumerateDevices feature not implemented in this camera";
+        }
+
+        if (!GenApi::IsAvailable(enumerateCmd)) 
+        {
+            RCLCPP_ERROR(LOGGER_BASE, "BslLightControlEnumerateDevices node not available (might be locked or camera not ready)");
+
+            if (cam_->IsGrabbing()) 
+            {
+                RCLCPP_WARN(LOGGER_BASE, "Camera is currently grabbing, which locks the feature. Call the stop grabbing service first");
+                return "BslLightControlEnumerateDevices node not available because the camera is currently grabbing. Call the stop grabbing service first.";
+            }
+            return "BslLightControlEnumerateDevices node not available.";
+        }
+
+        enumerateCmd->Execute();
+        RCLCPP_INFO(LOGGER_BASE, "Successfully executed BslLightControlEnumerateDevices");
+        return "done";
+        
+    } 
+    catch (const GenICam::GenericException &e) 
+    {
+        RCLCPP_ERROR_STREAM(LOGGER_BASE, "Pylon GenericException in enumerateLightDevices: " << e.GetDescription());
+        return std::string("Pylon GenericException: ") + e.GetDescription();
+    }
+    catch (const std::exception &e)
+    {
+        RCLCPP_ERROR_STREAM(LOGGER_BASE, "Standard exception in enumerateLightDevices: " << e.what());
+        return std::string("Standard exception: ") + e.what();
+    }
+    catch (...) 
+    {
+        RCLCPP_ERROR(LOGGER_BASE, "Unknown exception in enumerateLightDevices");
+        return "Unknown exception occurred";
+    }
+}
+
+
+template <typename CameraTraitT>
 bool PylonROS2CameraImpl<CameraTraitT>::setupSequencer(const std::vector<float>& exposure_times)
 {
     std::vector<float> exposure_times_set;
@@ -1017,7 +1084,7 @@ bool PylonROS2CameraImpl<CameraTraitT>::setBinningX(const size_t& target_binning
         }
         else
         {
-            RCLCPP_WARN_STREAM(LOGGER_BASE, "Camera does not support binning (X). Will keep the current settings.");
+
             reached_binning_x = currentBinningX();
         }
     }

@@ -537,6 +537,10 @@ void PylonROS2CameraNode::initServices()
 
   srv_name = srv_prefix + "update_sync_free_run_timer";
   this->update_sync_free_run_timer_srv_ = this->create_service<TriggerSrv>(srv_name, std::bind(&PylonROS2CameraNode::updateSyncFreeRunTimerCallback, this, _1, _2));
+
+  srv_name = srv_prefix + "enumerate_light_devices";
+  this->enumerate_light_devices_srv_ = this->create_service<TriggerSrv>(srv_name, std::bind(&PylonROS2CameraNode::enumerateLightDevicesCallback, this, _1, _2));
+  
 }
 
 void PylonROS2CameraNode::initActions()
@@ -4259,6 +4263,21 @@ void PylonROS2CameraNode::updateSyncFreeRunTimerCallback(const std::shared_ptr<T
 {
   (void)request;
   response->message = this->pylon_camera_->updateSyncFreeRunTimer();
+  if (response->message.find("done") != std::string::npos)
+  {
+    response->success = true;
+  }
+  else 
+  {
+    response->success = false;
+  }
+}
+
+void PylonROS2CameraNode::enumerateLightDevicesCallback(const std::shared_ptr<TriggerSrv::Request> request,
+                                                  std::shared_ptr<TriggerSrv::Response> response)
+{
+  (void)request;
+  response->message = this->pylon_camera_->enumerateLightDevices();
   if (response->message.find("done") != std::string::npos)
   {
     response->success = true;

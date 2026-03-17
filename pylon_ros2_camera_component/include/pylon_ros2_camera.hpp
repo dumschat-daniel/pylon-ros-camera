@@ -1258,8 +1258,13 @@ public:
      * @return error message if an error occurred or done message otherwise.
      */
     virtual std::string enableFastMode(const bool& enable) = 0;
+    
+    
+    virtual std::string enumerateLightDevices() = 0;
 
     virtual ~PylonROS2Camera();
+
+    
 
 protected:
     /**

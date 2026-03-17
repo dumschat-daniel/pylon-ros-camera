@@ -1463,6 +1463,15 @@ protected:
                                       std::shared_ptr<TriggerSrv::Response> response);
 
   /**
+   * @brief Service callback for enumerating Light Controller Devices.
+   * @param req request
+   * @param res response
+   */
+  void enumerateLightDevicesCallback(
+    const std::shared_ptr<TriggerSrv::Request> request,
+    std::shared_ptr<TriggerSrv::Response> response);
+
+  /**
    * @brief Handle action goal relatively raw image grabbing
    * @return goal response
    */
@@ -1676,6 +1685,7 @@ protected:
   rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr blaze_cam_info_pub_;
 
   // services
+
   rclcpp::Service<GetIntegerSrv>::SharedPtr get_max_num_buffer_srv_;
   rclcpp::Service<GetIntegerSrv>::SharedPtr get_statistic_total_buffer_count_srv_;
   rclcpp::Service<GetIntegerSrv>::SharedPtr get_statistic_failed_buffer_count_srv_;
@@ -1805,6 +1815,9 @@ protected:
   rclcpp::Service<TriggerSrv>::SharedPtr start_grabbing_srv_;
   rclcpp::Service<TriggerSrv>::SharedPtr stop_grabbing_srv_;
   rclcpp::Service<TriggerSrv>::SharedPtr update_sync_free_run_timer_srv_;
+
+  // light control related services
+  rclcpp::Service<TriggerSrv>::SharedPtr enumerate_light_devices_srv_;
 
   std::vector<rclcpp::Service<SetBoolSrv>::SharedPtr> set_user_output_srvs_;
 

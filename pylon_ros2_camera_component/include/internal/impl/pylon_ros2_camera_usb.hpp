@@ -245,13 +245,19 @@ bool PylonROS2USBCamera::applyCamSpecificStartupSettings(const PylonROS2CameraPa
             RCLCPP_WARN_STREAM(LOGGER_USB, "Unsupported startup user profile \"" << parameters.startup_user_set_ << "\", ignoring");
             RCLCPP_INFO(LOGGER_USB, "CurrentSetting loaded");
         }
+
+
     }
+
+
     catch ( const GenICam::GenericException &e )
     {
         RCLCPP_ERROR_STREAM(LOGGER_USB, "Error applying camera specific startup setting for USB cameras: "
                 << e.GetDescription());
         return false;
     }
+
+
     return true;
 }
 
